@@ -5,28 +5,35 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use  App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class AuthController extends Controller
 {
     /**
      * Store a new user.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @return Response
      */
     public function register(Request $request)
     {
         //validate incoming request
         $this->validate($request, [
-            'name' => 'required|string',
             'email' => 'required|email|unique:users',
+            'fullname' => 'required|string',
             'password' => 'required|confirmed',
         ]);
 
         try {
 
             $user = new User;
-            $user->name = $request->input('name');
+            $user->fullname = $request->input('fullname');
+            $user->birthday = $request->input('birthday');
+            $user->country = $request->input('country');
+            $user->document_number = $request->input('document_number');
+            $user->document_type = $request->input('document_type');
+            $user->gender = $request->input('gender');
+            $user->phone = $request->input('phone');
             $user->email = $request->input('email');
             $plainPassword = $request->input('password');
             $user->password = app('hash')->make($plainPassword);
@@ -38,7 +45,7 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             //return error message
-            return response()->json(['message' => 'User Registration Failed!'], 409);
+            return response()->json(['message' => 'User Registration Failed! ' . $e], 409);
         }
 
     }
@@ -46,7 +53,7 @@ class AuthController extends Controller
     /**
      * Get a JWT via given credentials.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @return Response
      */
     public function login(Request $request)
@@ -59,13 +66,12 @@ class AuthController extends Controller
 
         $credentials = $request->only(['email', 'password']);
 
-        if (! $token = Auth::attempt($credentials)) {
+        if (!$token = Auth::attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         return $this->respondWithToken($token);
     }
-
 
 
 }
