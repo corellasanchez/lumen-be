@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use  App\Models\User;
+use App\Filters\UserFilters;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    protected $model;
+
     /**
      * Instantiate a new UserController instance.
      *
@@ -54,6 +58,11 @@ class UserController extends Controller
             return response()->json(['message' => 'user not found!'], 404);
         }
 
+    }
+
+    public function index(Request $request, UserFilters $filters, User $model)
+    {
+        return User::filter( $filters, $model)->get();
     }
 
 }

@@ -34,5 +34,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('users/{id}', 'UserController@singleUser');
 
     // Matches "/api/users
-    $router->get('users', 'UserController@allUsers');
+    $router->get('users', 'UserController@index');
 });
