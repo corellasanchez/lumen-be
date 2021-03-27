@@ -2,67 +2,123 @@
 
 namespace App\Http\Controllers;
 
-//use Illuminate\Support\Facades\Auth;
-use  App\Models\User;
-use App\Filters\UserFilters;
+use  App\Models\Licence;
+use App\Filters\LicenceFilters;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use DateTime;
 
-class UserController extends Controller
+class LicenceController extends Controller
 {
     protected $model;
 
-    /**
-     * Instantiate a new UserController instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function index(Request $request, LicenceFilters $filters, Licence $model)
     {
-      //  $this->middleware('auth');
+        return User::filter($filters, $model)->get();
     }
 
     /**
-     * Get the authenticated User.
+     * Store a new Licence.
      *
+     * @param Request $request
      * @return Response
      */
-    public function profile()
+    public function store(Request $request, Licence $model)
     {
-        return response()->json(['user' => Auth::user()], 200);
+        //validate incoming request
+        $this->validate($request, [
+            'type' => 'required',
+            'user_id' => 'required'
+        ]);
+        $request['licence'] = Str::uuid()->toString();
+
+        return $this->defaultStore($model, $request->all());
     }
 
     /**
-     * Get all User.
+     * Pay Licence.
      *
+     * @param Request $request
      * @return Response
      */
-    public function allUsers()
+    public function pay(Request $request, Licence $model, $id)
     {
-        return response()->json(['users' => User::all()], 200);
+        //validate incoming request
+        $this->validate($request, [
+            'price' => 'required'
+        ]);
+
+        $request['payment_date'] = date("Y-m-d");
+        $request['paid'] = true;
+
+        return $this->defaultUpdate($model, $request->all(), $id);
     }
 
     /**
-     * Get one user.
+     * Activate Licence.
      *
+     * @param Request $request
      * @return Response
      */
-    public function singleUser($id)
+    public function activate(Request $request, Licence $model, $id)
     {
         try {
-            $user = User::findOrFail($id);
+            //validate incoming request
+            $this->validate($request, [
+                'customer' => 'required'
+            ]);
 
-            return response()->json(['user' => $user], 200);
+            $licence = $model->findOrFail($id)->get()->toArray()[0];
+
+            if ($licence['activated_date']) {
+                return response()->json(['message' => 'Licence was already activated!', 'success' => false], 404);
+            }
+
+            $request['activated_date'] = date("Y-m-d");
+            $request['expiration_date'] = date("Y-m-d", strtotime(date("Y-m-d", strtotime($request['activated_date'])) . " + 1 year"));
+
+            return $this->defaultUpdate($model, $request->all(), $id);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error trying to activate the licence'], 404);
+        }
+    }
+
+    /**
+     * Activate Licence.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function verify(Request $request, Licence $model)
+    {
+        //validate incoming request
+        $this->validate($request, [
+            'customer' => 'required',
+            'licence' => 'required'
+        ]);
+
+        try {
+            $licence = $model->where('customer', '=', $request['customer'])->where('licence', '=', $request['licence'])->get()->toArray()[0];
+
+            if (!isset($licence['id'])) {
+                return response()->json(['message' => 'Licence Not Found!', 'success' => false], 404);
+            }
+
+            $today = new DateTime();
+            $expiration_date = new DateTime($licence['expiration_date']);
+
+            if (!$licence['paid']) {
+                return response()->json(['message' => "Licence is not paid yet contact sales", 'success' => false], 200);
+            };
+
+            if ($expiration_date < $today) {
+                return response()->json(['message' => "Licence expired since " . $expiration_date->format('Y-m-d'), 'success' => false], 404);
+            };
+
+            return response()->json(['data' => $licence, 'message' => 'Valid Licence', 'success' => true], 200);
 
         } catch (\Exception $e) {
-
-            return response()->json(['message' => 'user not found!'], 404);
+            return response()->json(['message' => 'Invalid Licence!'], 404);
         }
-
     }
-
-    public function index(Request $request, UserFilters $filters, User $model)
-    {
-        return User::filter( $filters, $model)->get();
-    }
-
 }

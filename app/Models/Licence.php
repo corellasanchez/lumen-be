@@ -14,13 +14,10 @@ class Licence extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'licence',
-        'customer',
-        'activated_date',
-        'expiration_date',
-        'type',
-        'email'
-     ];
+    protected $guarded = [];
+
+    protected $hidden = [
+        'user_id'
+    ];
 
 }

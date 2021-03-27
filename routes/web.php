@@ -20,6 +20,9 @@ $router->get('/', function () use ($router) {
 
 // API route group
 $router->group(['prefix' => 'api'], function () use ($router) {
+
+    /////////////////////////// USERS /////////////////////////////
+
     // Matches "/api/register
     $router->post('register', 'AuthController@register');
 
@@ -35,4 +38,25 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     // Matches "/api/users
     $router->get('users', 'UserController@index');
+
+
+    /////////////////////////// LICENCES /////////////////////////////
+
+    // Matches "/api/licences
+    $router->get('licences', 'LicenceController@index');
+
+    // Matches Post "/api/licences register
+    $router->post('licences', 'LicenceController@store');
+
+    // Matches Put  "/api/licences pay licence
+    $router->put('licences/{id}', 'LicenceController@pay');
+
+    // Matches Put  "/api/licences activate licence
+    $router->put('licences/activate/{id}', 'LicenceController@activate');
+
+    // Matches Post "/api/licences/verify
+    $router->post('licences/verify', 'LicenceController@verify');
+
+    //////////////////////////////////////////////////////////////////
+
 });
