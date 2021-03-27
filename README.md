@@ -2,6 +2,9 @@
 A mysql and php backend based on Lumen framework
 
 ## Instalation
+**brew install composer**
+  
+composer install
 
 **MYSQL SERVER INSTALATION**  
 brew install MYSQL  
