@@ -28,7 +28,7 @@ class Controller extends BaseController
              * second is where ->create results in the business object itself, which
              * is put into the 'data' attr of the eventual response.
              */
-            if (array_key_exists('data', $results)) {
+            if (isset($results['data'])) {
                 $results['success'] = true;
             } else {
                 $results = [

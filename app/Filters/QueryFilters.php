@@ -42,9 +42,9 @@ class QueryFilters
 
     public function generateCriteria($filterName, $filterValue)
     {
-        $criteria = array_key_exists($filterName, $this->filterCriterias) ? $this->filterCriterias[$filterName] : '=';
-        $value = $criteria === 'LIKE' ?  "%$filterValue%" : $filterValue;
-        return $this->builder->where( $this->table .'.'. $filterName,  $criteria , $value);
+        $criteria = isset($this->filterCriterias[$filterName]) ? $this->filterCriterias[$filterName] : '=';
+        $value = $criteria === 'LIKE' ? "%$filterValue%" : $filterValue;
+        return $this->builder->where($this->table . '.' . $filterName, $criteria, $value);
     }
 }
 
