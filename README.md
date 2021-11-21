@@ -19,5 +19,6 @@ composer install
 
 php artisan jwt:secret  
   
-Run the PHP server:  
+Run the PHP server:
+In windows xampp needs to be up  
 php -S localhost:8000 -t public
