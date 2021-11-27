@@ -104,6 +104,7 @@ $app->register(Nord\Lumen\Cors\CorsServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 
 //Mail
+$app->configure('services');
 $app->configure('mail');
 $app->alias('mail.manager', Illuminate\Mail\MailManager::class);
 $app->alias('mail.manager', Illuminate\Contracts\Mail\Factory::class);
