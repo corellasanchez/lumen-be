@@ -39,6 +39,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Matches "/api/users
     $router->get('users', 'UserController@index');
 
+    // Matches Post "/api/users/reset-password
+    $router->post('users/reset-password', 'AuthController@resetPassword');
+
 
     /////////////////////////// LICENCES /////////////////////////////
 

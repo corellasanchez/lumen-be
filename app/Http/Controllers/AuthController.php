@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use  App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use App\Models\User;
+
+use App\Mail\PasswordResetEmail;
 
 class AuthController extends Controller
 {
@@ -73,5 +77,23 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
+    /**
+     * Create a reset code for the email.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function resetPassword(Request $request){
+        $uuid = (string) Str::uuid();
+        $email = new PasswordResetEmail;
+      
+        try {
+            Mail::to('corellasanchez@gmail.com')->send($email);
+        } catch (Exception $e) {
+           dd($e);
 
+            return false;
+        }
+        return response()->json($uuid);
+    }
 }
