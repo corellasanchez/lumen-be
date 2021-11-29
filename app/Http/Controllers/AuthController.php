@@ -46,12 +46,10 @@ class AuthController extends Controller
 
             //return successful response
             return response()->json(['user' => $user, 'message' => 'CREATED'], 201);
-
         } catch (\Exception $e) {
             //return error message
             return response()->json(['message' => 'User Registration Failed! ' . $e], 409);
         }
-
     }
 
     /**
@@ -77,23 +75,52 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
+    
+    
     /**
      * Create a reset code for the email.
      *
      * @param Request $request
      * @return Response
      */
-    public function resetPassword(Request $request){
+    public function resetForgot(Request $request)
+    {
         $uuid = (string) Str::uuid();
-        $email = new PasswordResetEmail;
-      
-        try {
-            Mail::to('corellasanchez@gmail.com')->send($email);
-        } catch (Exception $e) {
-           dd($e);
+        $sendTo = $request->email;
+        $user = User::where('email', '=', $sendTo)->firstOrFail();
+        $user['reset-code'] = $uuid;
+        $user->save();
+        $email = new PasswordResetEmail($user);
 
-            return false;
-        }
+        // try {
+        //     Mail::to('corellasanchez@gmail.com')->send($email);
+        // } catch (Exception $e) {
+        //     return false;
+        // }
+        return response()->json($uuid);
+    }
+    
+    
+    /**
+     * Create a reset code for the email.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function resetPassword(Request $request)
+    {
+        $uuid = (string) Str::uuid();
+        $sendTo = $request->email;
+        $user = User::where('email', '=', $sendTo)->firstOrFail();
+        $user['reset-code'] = $uuid;
+        $user->save();
+        $email = new PasswordResetEmail($user);
+
+        // try {
+        //     Mail::to('corellasanchez@gmail.com')->send($email);
+        // } catch (Exception $e) {
+        //     return false;
+        // }
         return response()->json($uuid);
     }
 }

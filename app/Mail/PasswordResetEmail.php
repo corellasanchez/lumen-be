@@ -8,10 +8,25 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\View;
 
+use App\Models\User;
+
 
 class PasswordResetEmail extends Mailable
 {    
-    use Queueable, SerializesModels;       
+    use Queueable, SerializesModels;  
+    
+    public $user;
+
+    /**
+     * Create a new message instance.
+     *
+     * @param  \App\Models\User  $user
+     * @return void
+     */
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
    
     public function build()
     {
